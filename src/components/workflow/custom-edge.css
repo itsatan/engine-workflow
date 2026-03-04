@@ -1,7 +1,3 @@
-.custom-edge__hover-zone {
-  cursor: pointer;
-}
-
 .custom-edge__time-label {
   background-color: var(--workflow-surface);
   border: 1px solid var(--workflow-border);
@@ -17,6 +13,7 @@
 
 .custom-edge__add-btn-wrapper {
   z-index: 10;
+  padding: 0.5rem;
 }
 
 .custom-edge__add-btn {

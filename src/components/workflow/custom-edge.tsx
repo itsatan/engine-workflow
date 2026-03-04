@@ -21,7 +21,6 @@ export function WorkflowEdge({
   style,
   markerEnd,
 }: EdgeProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const edgeData = useWorkflowStore((s) => s.edgeExecutionData[id]);
   const isExecuting = useWorkflowStore((s) => s.isExecuting);
@@ -39,19 +38,6 @@ export function WorkflowEdge({
 
   return (
     <>
-      {/* Invisible wide path for hover detection */}
-      <path
-        d={edgePath}
-        fill="none"
-        stroke="transparent"
-        strokeWidth={20}
-        className="custom-edge__hover-zone"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          if (!showPopover) setIsHovered(false);
-        }}
-      />
-
       {/* Visible edge */}
       <BaseEdge
         id={id}
@@ -71,7 +57,7 @@ export function WorkflowEdge({
             className="custom-edge__time-label"
             style={{
               position: "absolute",
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - 16}px)`,
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
             }}
           >
@@ -79,18 +65,14 @@ export function WorkflowEdge({
           </div>
         )}
 
-        {/* "+" button on hover */}
-        {(isHovered || showPopover) && !isExecuting && (
+        {/* "+" button - visible when no execution data and not running */}
+        {!edgeData && !isExecuting && (
           <div
             className="custom-edge__add-btn-wrapper"
             style={{
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => {
-              if (!showPopover) setIsHovered(false);
             }}
           >
             <button
@@ -117,7 +99,6 @@ export function WorkflowEdge({
               edgeId={id}
               onClose={() => {
                 setShowPopover(false);
-                setIsHovered(false);
               }}
             />
           </div>
