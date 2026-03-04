@@ -1,0 +1,41 @@
+.custom-edge__hover-zone {
+  cursor: pointer;
+}
+
+.custom-edge__time-label {
+  background-color: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.625rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  color: var(--color-emerald-400);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.custom-edge__add-btn-wrapper {
+  z-index: 10;
+}
+
+.custom-edge__add-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  color: var(--workflow-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.custom-edge__add-btn:hover {
+  background-color: var(--color-emerald-600);
+  border-color: var(--color-emerald-500);
+  color: white;
+  transform: scale(1.1);
+}

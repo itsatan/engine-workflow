@@ -60,8 +60,8 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "github-1", target: "ai-1", type: "default", animated: true },
-      { id: "e2", source: "ai-1", target: "output-1", type: "default", animated: true },
+      { id: "e1", source: "github-1", target: "ai-1", type: "workflow", animated: true },
+      { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: true },
     ],
   },
   {
@@ -133,10 +133,10 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "github-1", target: "merge-1", type: "default", animated: true },
-      { id: "e2", source: "memory-1", target: "merge-1", type: "default", animated: true },
-      { id: "e3", source: "merge-1", target: "ai-1", type: "default", animated: true },
-      { id: "e4", source: "ai-1", target: "output-1", type: "default", animated: true },
+      { id: "e1", source: "github-1", target: "merge-1", type: "workflow", animated: true },
+      { id: "e2", source: "memory-1", target: "merge-1", type: "workflow", animated: true },
+      { id: "e3", source: "merge-1", target: "ai-1", type: "workflow", animated: true },
+      { id: "e4", source: "ai-1", target: "output-1", type: "workflow", animated: true },
     ],
   },
   {
@@ -181,8 +181,8 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "text-1", target: "ai-1", type: "default", animated: true },
-      { id: "e2", source: "ai-1", target: "output-1", type: "default", animated: true },
+      { id: "e1", source: "text-1", target: "ai-1", type: "workflow", animated: true },
+      { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: true },
     ],
   },
   {

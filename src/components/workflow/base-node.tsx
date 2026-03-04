@@ -2,6 +2,7 @@ import type React from "react";
 import { Handle, Position, type NodeProps, useReactFlow } from "@xyflow/react";
 import type { WorkflowNodeType, BaseNodeData } from "@/lib/workflow-types";
 import { NODE_COLORS } from "@/lib/node-styles";
+import { useWorkflowStore } from "@/store/workflow-store";
 import {
   Sparkles,
   ImageIcon,
@@ -12,6 +13,10 @@ import {
   Type,
   Merge,
   X,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
 } from "lucide-react";
 import "./base-node.css";
 
@@ -49,18 +54,26 @@ export function BaseNode({
   const colors = NODE_COLORS[nodeType];
   const icon = ICONS[nodeType];
   const { deleteElements } = useReactFlow();
+  const executionStatus = useWorkflowStore((s) => s.nodeExecutionStatus[id]);
+  const executionResult = useWorkflowStore((s) => s.nodeExecutionResults[id]);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     deleteElements({ nodes: [{ id }] });
   };
 
-  const className = `base-node${selected ? " base-node--selected" : ""}`;
+  const className = [
+    'base-node',
+    selected && 'base-node--selected',
+    executionStatus === 'running' && 'base-node--running',
+    executionStatus === 'success' && 'base-node--success',
+    executionStatus === 'error' && 'base-node--error',
+  ].filter(Boolean).join(' ');
 
   return (
     <div
       className={className}
-      style={{ borderColor: colors.borderColor }}
+      style={{ borderColor: executionStatus === 'running' ? 'var(--execution-running)' : executionStatus === 'success' ? 'var(--execution-success)' : executionStatus === 'error' ? 'var(--execution-error)' : colors.borderColor }}
     >
       {hasInput && (
         <Handle
@@ -74,6 +87,18 @@ export function BaseNode({
           {icon}
         </span>
         <span className="base-node__label">{(data as BaseNodeData).label}</span>
+        {executionStatus === 'running' && (
+          <Loader2 size={14} className="animate-spin base-node__status base-node__status--running" />
+        )}
+        {executionStatus === 'success' && (
+          <CheckCircle2 size={14} className="base-node__status base-node__status--success" />
+        )}
+        {executionStatus === 'error' && (
+          <AlertCircle size={14} className="base-node__status base-node__status--error" />
+        )}
+        {executionStatus === 'waiting' && (
+          <Clock size={14} className="base-node__status base-node__status--waiting" />
+        )}
         <button
           type="button"
           onClick={handleDelete}
@@ -85,6 +110,13 @@ export function BaseNode({
       </div>
 
       <div className="base-node__content">{children}</div>
+
+      {executionResult && (
+        <div className="base-node__execution-time">
+          <Clock size={10} />
+          <span>{executionResult.durationMs}ms</span>
+        </div>
+      )}
 
       {hasOutput && !hasTrueOutput && (
         <Handle

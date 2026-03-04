@@ -94,6 +94,16 @@ export interface Workflow {
   updatedAt: string;
 }
 
+// Node execution status
+export type NodeExecutionStatus = 'idle' | 'waiting' | 'running' | 'success' | 'error';
+
+// Edge execution data
+export interface EdgeExecutionData {
+  edgeId: string;
+  durationMs: number;
+  dataSize?: number;
+}
+
 // Execution result
 export interface ExecutionResult {
   nodeId: string;
@@ -101,6 +111,9 @@ export interface ExecutionResult {
   output: string | null;
   error?: string;
   timestamp: string;
+  durationMs: number;
+  startedAt: string;
+  completedAt: string;
 }
 
 export interface WorkflowExecution {
@@ -108,6 +121,7 @@ export interface WorkflowExecution {
   workflowId: string;
   status: "pending" | "running" | "completed" | "failed";
   results: ExecutionResult[];
+  edgeResults: EdgeExecutionData[];
   finalOutput?: string;
   startedAt: string;
   completedAt?: string;

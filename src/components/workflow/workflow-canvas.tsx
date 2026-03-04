@@ -5,8 +5,8 @@ import {
   Controls,
   MiniMap,
   type Connection,
-  type Edge,
   type NodeTypes,
+  type EdgeTypes,
   BackgroundVariant,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -22,6 +22,7 @@ import {
   TextInputNode,
   MergeNode,
 } from "./nodes";
+import { WorkflowEdge } from "./custom-edge";
 import { useWorkflowStore } from "@/store/workflow-store";
 import "./workflow-canvas.css";
 
@@ -34,6 +35,10 @@ const nodeTypes: NodeTypes = {
   output: OutputNode,
   textInput: TextInputNode,
   merge: MergeNode,
+};
+
+const edgeTypes: EdgeTypes = {
+  workflow: WorkflowEdge,
 };
 
 const defaultNodeData: Record<WorkflowNodeType, WorkflowNodeData> = {
@@ -96,6 +101,7 @@ export function WorkflowCanvas() {
   const themedEdges = useMemo(() => {
     return edges.map((edge) => ({
       ...edge,
+      type: "workflow",
       style: {
         ...edge.style,
         strokeWidth: 2,
@@ -154,6 +160,7 @@ export function WorkflowCanvas() {
         onDragOver={onDragOver}
         onDrop={onDrop}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         fitViewOptions={{
           padding: 0.3,
@@ -162,7 +169,7 @@ export function WorkflowCanvas() {
         snapToGrid
         snapGrid={[16, 16]}
         defaultEdgeOptions={{
-          type: "default",
+          type: "workflow",
           style: { strokeWidth: 2, stroke: "#52525b" },
           animated: true,
         }}

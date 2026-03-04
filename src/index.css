@@ -60,6 +60,12 @@
   --color-rose-400: hsl(350, 89%, 60%);
   --color-rose-500: hsl(347, 77%, 50%);
   --color-amber-500: hsl(38, 92%, 50%);
+
+  /* 执行状态色 */
+  --execution-running: hsl(38, 92%, 50%);
+  --execution-success: hsl(160, 84%, 39%);
+  --execution-error: hsl(347, 77%, 50%);
+  --execution-waiting: hsl(0, 0%, 45%);
 }
 
 /* 全局 body 样式 */

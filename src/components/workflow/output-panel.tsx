@@ -134,6 +134,11 @@ export function OutputPanel() {
                   >
                     <span className="output-panel__log-item-type">[{result.nodeType}]</span>{" "}
                     {result.error || "OK"}
+                    {result.durationMs !== undefined && (
+                      <span style={{ color: "var(--workflow-text-subtle)", marginLeft: "0.375rem", fontSize: "0.625rem" }}>
+                        ({result.durationMs}ms)
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

@@ -15,6 +15,8 @@ import type {
   WorkflowNodeData,
   Workflow,
   ExecutionResult,
+  EdgeExecutionData,
+  NodeExecutionStatus,
   TextInputNodeData,
   MergeNodeData,
   OutputNodeData,
@@ -122,8 +124,8 @@ const initialNodes: WorkflowNode[] = [
 ];
 
 const initialEdges: Edge[] = [
-  { id: "e1", source: "github-1", target: "ai-1", type: "default", animated: true },
-  { id: "e2", source: "ai-1", target: "output-1", type: "default", animated: true },
+  { id: "e1", source: "github-1", target: "ai-1", type: "workflow", animated: true },
+  { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: true },
 ];
 
 // Topological sort for execution order
@@ -224,6 +226,11 @@ interface WorkflowState {
   showHistoryDialog: boolean;
   selectedNode: WorkflowNode | null;
 
+  // Execution status tracking
+  nodeExecutionStatus: Record<string, NodeExecutionStatus>;
+  nodeExecutionResults: Record<string, ExecutionResult>;
+  edgeExecutionData: Record<string, EdgeExecutionData>;
+
   // Node/Edge change handlers
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
@@ -231,6 +238,7 @@ interface WorkflowState {
 
   // Node operations
   addNode: (nodeType: WorkflowNodeType) => void;
+  addNodeOnEdge: (edgeId: string, nodeType: WorkflowNodeType) => void;
   updateNode: (nodeId: string, data: Partial<WorkflowNode["data"]>) => void;
   setNodes: (nodes: WorkflowNode[]) => void;
   setEdges: (edges: Edge[]) => void;
@@ -270,6 +278,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   showLoadDialog: false,
   showHistoryDialog: false,
   selectedNode: null,
+  nodeExecutionStatus: {},
+  nodeExecutionResults: {},
+  edgeExecutionData: {},
 
   // Node/Edge change handlers
   onNodesChange: (changes) => {
@@ -304,7 +315,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   onConnect: (connection) => {
     set((state) => ({
-      edges: addEdge({ ...connection, type: "default", animated: true }, state.edges),
+      edges: addEdge({ ...connection, type: "workflow", animated: true }, state.edges),
       hasChanges: true,
     }));
   },
@@ -321,6 +332,50 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     };
     set({
       nodes: [...state.nodes, newNode],
+      hasChanges: true,
+    });
+  },
+
+  addNodeOnEdge: (edgeId, nodeType) => {
+    const state = get();
+    const edge = state.edges.find((e) => e.id === edgeId);
+    if (!edge) return;
+
+    const sourceNode = state.nodes.find((n) => n.id === edge.source);
+    const targetNode = state.nodes.find((n) => n.id === edge.target);
+    if (!sourceNode || !targetNode) return;
+
+    const midX = (sourceNode.position.x + targetNode.position.x) / 2;
+    const midY = (sourceNode.position.y + targetNode.position.y) / 2;
+
+    const newNode: WorkflowNode = {
+      id: `${nodeType}-${Date.now()}`,
+      type: nodeType,
+      position: { x: midX, y: midY },
+      data: { ...defaultNodeData[nodeType] },
+    };
+
+    const newEdges = state.edges.filter((e) => e.id !== edgeId);
+    const newEdge1: Edge = {
+      id: `e-${edge.source}-${newNode.id}`,
+      source: edge.source,
+      sourceHandle: edge.sourceHandle ?? undefined,
+      target: newNode.id,
+      type: "workflow",
+      animated: true,
+    };
+    const newEdge2: Edge = {
+      id: `e-${newNode.id}-${edge.target}`,
+      source: newNode.id,
+      target: edge.target,
+      targetHandle: edge.targetHandle ?? undefined,
+      type: "workflow",
+      animated: true,
+    };
+
+    set({
+      nodes: [...state.nodes, newNode],
+      edges: [...newEdges, newEdge1, newEdge2],
       hasChanges: true,
     });
   },
@@ -414,6 +469,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       hasChanges: false,
       execution: null,
       selectedNode: null,
+      nodeExecutionStatus: {},
+      nodeExecutionResults: {},
+      edgeExecutionData: {},
     });
   },
 
@@ -423,6 +481,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       edges: [],
       hasChanges: true,
       selectedNode: null,
+      nodeExecutionStatus: {},
+      nodeExecutionResults: {},
+      edgeExecutionData: {},
     });
   },
 
@@ -434,6 +495,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       edges,
       hasChanges: true,
       selectedNode: null,
+      nodeExecutionStatus: {},
+      nodeExecutionResults: {},
+      edgeExecutionData: {},
     });
   },
 
@@ -444,22 +508,43 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   setShowHistoryDialog: (show) => set({ showHistoryDialog: show }),
   setWorkflowName: (name) => set({ workflowName: name, hasChanges: true }),
 
-  // Execution - front-end simulated execution
+  // Execution - async per-node simulated execution with timing
   execute: () => {
     const state = get();
     if (state.nodes.length === 0) return;
 
-    set({ isExecuting: true, showOutput: true, execution: null });
+    // Initialize all nodes as waiting
+    const initialStatus: Record<string, NodeExecutionStatus> = {};
+    for (const node of state.nodes) {
+      initialStatus[node.id] = 'waiting';
+    }
 
-    // Simulate async execution
-    setTimeout(() => {
+    set({
+      isExecuting: true,
+      showOutput: true,
+      execution: null,
+      nodeExecutionStatus: initialStatus,
+      nodeExecutionResults: {},
+      edgeExecutionData: {},
+    });
+
+    // Run async execution
+    (async () => {
       const { nodes, edges, workflowId } = get();
       const nodeOutputs = new Map<string, string>();
       const results: ExecutionResult[] = [];
+      const edgeResults: EdgeExecutionData[] = [];
       const sortedNodes = topologicalSort(nodes, edges);
       let finalOutput = "";
 
       for (const node of sortedNodes) {
+        // Mark current node as running
+        set((s) => ({
+          nodeExecutionStatus: { ...s.nodeExecutionStatus, [node.id]: 'running' as NodeExecutionStatus },
+        }));
+
+        const nodeStartTime = performance.now();
+
         // Get inputs from connected nodes
         const incomingEdges = edges.filter((e) => e.target === node.id);
         const inputs: string[] = [];
@@ -468,9 +553,21 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
           if (output !== undefined) {
             inputs.push(output);
           }
+          const edgeData: EdgeExecutionData = {
+            edgeId: edge.id,
+            durationMs: Math.max(Math.round(Math.random() * 5 + 1), 1),
+            dataSize: output?.length,
+          };
+          edgeResults.push(edgeData);
+          set((s) => ({
+            edgeExecutionData: { ...s.edgeExecutionData, [edge.id]: edgeData },
+          }));
         }
         const combinedInput = inputs.join("\n\n");
         let output = "";
+
+        // Simulate per-node async delay (200-600ms)
+        await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 400));
 
         switch (node.type as WorkflowNodeType) {
           case "textInput": {
@@ -489,8 +586,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
           }
           case "condition": {
             const data = node.data as ConditionNodeData;
-            const result = evaluateCondition(data, combinedInput);
-            output = result ? "true" : "false";
+            const condResult = evaluateCondition(data, combinedInput);
+            output = condResult ? "true" : "false";
             break;
           }
           case "merge": {
@@ -513,13 +610,27 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
             output = combinedInput;
         }
 
-        nodeOutputs.set(node.id, output);
-        results.push({
+        const durationMs = Math.round(performance.now() - nodeStartTime);
+        const now = new Date().toISOString();
+
+        const result: ExecutionResult = {
           nodeId: node.id,
           nodeType: node.type as WorkflowNodeType,
           output,
-          timestamp: new Date().toISOString(),
-        });
+          timestamp: now,
+          durationMs,
+          startedAt: new Date(Date.now() - durationMs).toISOString(),
+          completedAt: now,
+        };
+
+        results.push(result);
+        nodeOutputs.set(node.id, output);
+
+        // Mark node as success and store result
+        set((s) => ({
+          nodeExecutionStatus: { ...s.nodeExecutionStatus, [node.id]: 'success' as NodeExecutionStatus },
+          nodeExecutionResults: { ...s.nodeExecutionResults, [node.id]: result },
+        }));
       }
 
       if (!finalOutput && results.length > 0) {
@@ -531,6 +642,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         workflowId: workflowId || "",
         status: "completed",
         results,
+        edgeResults,
         finalOutput,
         startedAt: new Date().toISOString(),
         completedAt: new Date().toISOString(),
@@ -546,7 +658,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       }
 
       set({ execution, isExecuting: false });
-    }, 800);
+    })();
   },
 
   selectHistoryRun: (output) => {
@@ -556,6 +668,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         workflowId: get().workflowId || "",
         status: "completed",
         results: [],
+        edgeResults: [],
         finalOutput: output,
         startedAt: new Date().toISOString(),
         completedAt: new Date().toISOString(),

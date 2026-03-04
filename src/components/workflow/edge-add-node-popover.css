@@ -1,0 +1,55 @@
+.edge-popover {
+  background-color: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  min-width: 180px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.edge-popover__header {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--workflow-border);
+  font-size: 0.625rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--workflow-text-subtle);
+}
+
+.edge-popover__list {
+  padding: 0.25rem;
+}
+
+.edge-popover__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: none;
+  background: transparent;
+  color: var(--workflow-text);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease;
+}
+
+.edge-popover__item:hover {
+  background-color: var(--workflow-surface-hover);
+}
+
+.edge-popover__item-icon {
+  display: flex;
+  align-items: center;
+  color: var(--workflow-text-muted);
+}
+
+.edge-popover__item-name {
+  flex: 1;
+  text-align: left;
+}
