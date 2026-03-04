@@ -351,6 +351,19 @@ export function NodeEditPanel() {
             </select>
           </div>
         )}
+
+        {/* Group Node */}
+        {node.type === "group" && (
+          <div className="edit-field">
+            <label>Content</label>
+            <textarea
+              value={(node.data as { content?: string }).content || ""}
+              onChange={(e) => handleChange("content", e.target.value)}
+              placeholder="Group notes..."
+              style={{ height: "8rem" }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

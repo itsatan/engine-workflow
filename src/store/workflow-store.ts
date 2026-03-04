@@ -79,6 +79,13 @@ const defaultNodeData: Record<WorkflowNodeType, WorkflowNodeData> = {
     label: "Merge",
     separator: "\n\n",
   },
+  group: {
+    label: "Group",
+    color: "zinc",
+    content: "双击编辑此区域...\n\n可以在这里添加说明或备注。",
+    width: 400,
+    height: 300,
+  },
 };
 
 // Default initial nodes (README Generator template)
@@ -329,6 +336,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       type: nodeType,
       position: { x: xOffset, y: 200 },
       data: { ...defaultNodeData[nodeType] },
+      ...(nodeType === "group"
+        ? { style: { width: 400, height: 300 }, zIndex: -1 }
+        : {}),
     };
     set({
       nodes: [...state.nodes, newNode],
@@ -353,6 +363,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       type: nodeType,
       position: { x: midX, y: midY },
       data: { ...defaultNodeData[nodeType] },
+      ...(nodeType === "group"
+        ? { style: { width: 400, height: 300 }, zIndex: -1 }
+        : {}),
     };
 
     const newEdges = state.edges.filter((e) => e.id !== edgeId);
@@ -513,9 +526,10 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     const state = get();
     if (state.nodes.length === 0) return;
 
-    // Initialize all nodes as waiting
+    // Initialize all nodes as waiting (skip group nodes)
     const initialStatus: Record<string, NodeExecutionStatus> = {};
     for (const node of state.nodes) {
+      if (node.type === 'group') continue;
       initialStatus[node.id] = 'waiting';
     }
 
@@ -534,7 +548,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       const nodeOutputs = new Map<string, string>();
       const results: ExecutionResult[] = [];
       const edgeResults: EdgeExecutionData[] = [];
-      const sortedNodes = topologicalSort(nodes, edges);
+      const sortedNodes = topologicalSort(nodes, edges).filter((n) => n.type !== 'group');
       let finalOutput = "";
 
       for (const node of sortedNodes) {

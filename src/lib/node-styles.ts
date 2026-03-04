@@ -38,4 +38,8 @@ export const NODE_COLORS: Record<WorkflowNodeType, NodeColorStyle> = {
     borderColor: "var(--node-merge-border)",
     accentColor: "var(--node-merge-accent)",
   },
+  group: {
+    borderColor: "var(--node-group-border)",
+    accentColor: "var(--node-group-accent)",
+  },
 };

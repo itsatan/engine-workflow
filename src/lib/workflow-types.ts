@@ -58,6 +58,13 @@ export interface MergeNodeData extends BaseNodeData {
   separator: string;
 }
 
+export interface GroupNodeData extends BaseNodeData {
+  color: string;
+  content: string;
+  width: number;
+  height: number;
+}
+
 // Union type for all node data
 export type WorkflowNodeData =
   | AITextNodeData
@@ -67,7 +74,8 @@ export type WorkflowNodeData =
   | GitHubNodeData
   | OutputNodeData
   | TextInputNodeData
-  | MergeNodeData;
+  | MergeNodeData
+  | GroupNodeData;
 
 // Node types enum
 export type WorkflowNodeType =
@@ -78,7 +86,8 @@ export type WorkflowNodeType =
   | "github"
   | "output"
   | "textInput"
-  | "merge";
+  | "merge"
+  | "group";
 
 // Workflow Node with typed data
 export type WorkflowNode = Node<WorkflowNodeData, WorkflowNodeType>;

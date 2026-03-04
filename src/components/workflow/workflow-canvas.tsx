@@ -3,7 +3,6 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
   type Connection,
   type NodeTypes,
   type EdgeTypes,
@@ -21,6 +20,7 @@ import {
   OutputNode,
   TextInputNode,
   MergeNode,
+  GroupNode,
 } from "./nodes";
 import { WorkflowEdge } from "./custom-edge";
 import { useWorkflowStore } from "@/store/workflow-store";
@@ -35,6 +35,7 @@ const nodeTypes: NodeTypes = {
   output: OutputNode,
   textInput: TextInputNode,
   merge: MergeNode,
+  group: GroupNode,
 };
 
 const edgeTypes: EdgeTypes = {
@@ -92,6 +93,13 @@ const defaultNodeData: Record<WorkflowNodeType, WorkflowNodeData> = {
     label: "Merge",
     separator: "\n\n",
   },
+  group: {
+    label: "Group",
+    color: "zinc",
+    content: "",
+    width: 400,
+    height: 300,
+  },
 };
 
 export function WorkflowCanvas() {
@@ -135,6 +143,9 @@ export function WorkflowCanvas() {
         type,
         position,
         data: { ...defaultNodeData[type] },
+        ...(type === "group"
+          ? { style: { width: 400, height: 300 }, zIndex: -1 }
+          : {}),
       };
 
       setNodes([...nodes, newNode]);
@@ -181,10 +192,10 @@ export function WorkflowCanvas() {
           color="#27272a"
         />
         <Controls showInteractive={false} />
-        <MiniMap
+        {/* <MiniMap
           nodeColor="#3f3f46"
           maskColor="rgba(0, 0, 0, 0.7)"
-        />
+        /> */}
       </ReactFlow>
     </div>
   );

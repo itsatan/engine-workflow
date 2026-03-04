@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
+  Group,
 } from "lucide-react";
 import "./base-node.css";
 
@@ -29,6 +30,7 @@ const ICONS: Record<WorkflowNodeType, React.ReactNode> = {
   output: <FileOutput size={16} />,
   textInput: <Type size={16} />,
   merge: <Merge size={16} />,
+  group: <Group size={16} />,
 };
 
 interface BaseNodeComponentProps extends NodeProps {

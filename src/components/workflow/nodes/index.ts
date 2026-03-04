@@ -6,3 +6,4 @@ export { GitHubNode } from "./github-node";
 export { OutputNode } from "./output-node";
 export { TextInputNode } from "./text-input-node";
 export { MergeNode } from "./merge-node";
+export { GroupNode } from "./group-node";

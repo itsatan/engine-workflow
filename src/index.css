@@ -51,6 +51,8 @@
   --node-text-input-accent: hsl(217, 91%, 60%);
   --node-merge-border: rgba(249, 115, 22, 0.5);
   --node-merge-accent: hsl(25, 95%, 53%);
+  --node-group-border: rgba(113, 113, 122, 0.4);
+  --node-group-accent: hsl(240, 4%, 46%);
 
   /* 功能色 */
   --color-emerald-400: hsl(158, 64%, 52%);

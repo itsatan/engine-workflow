@@ -7,6 +7,7 @@ import {
   FileOutput,
   Type,
   Merge,
+  Group,
 } from "lucide-react";
 import type { WorkflowNodeType } from "./workflow-types";
 
@@ -63,5 +64,11 @@ export const NODE_DEFINITIONS: {
     label: "Output",
     description: "Export to document",
     icon: <FileOutput size={16} />,
+  },
+  {
+    type: "group",
+    label: "Group",
+    description: "Visual grouping background",
+    icon: <Group size={16} />,
   },
 ];
