@@ -1,6 +1,6 @@
 /* ==========================================
    全局样式 - FlowForge Engine
-   暗色主题（固定，不支持切换）
+   Light 主题 - 专业工作流编辑器
    ========================================== */
 
 /* Reset */
@@ -12,62 +12,66 @@
   box-sizing: border-box;
 }
 
-/* CSS 变量 - 暗色主题 */
+/* CSS 变量 - Light 主题 */
 :root {
   /* 基础色 */
-  --background: hsl(0, 0%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
+  --background: hsl(220, 20%, 97%);
+  --foreground: hsl(220, 20%, 15%);
 
   /* 工作流编辑器变量 */
-  --workflow-bg: hsl(0, 0%, 4%);
-  --workflow-surface: hsl(0, 0%, 7%);
-  --workflow-surface-hover: hsl(0, 0%, 10%);
-  --workflow-border: hsl(0, 0%, 15%);
-  --workflow-border-subtle: hsl(0, 0%, 18%);
-  --workflow-text: hsl(0, 0%, 90%);
-  --workflow-text-muted: hsl(0, 0%, 64%);
-  --workflow-text-subtle: hsl(0, 0%, 45%);
-  --workflow-node-bg: hsl(0, 0%, 7%);
-  --workflow-node-input: hsl(0, 0%, 12%);
-  --workflow-canvas-dot: hsl(0, 0%, 16%);
-  --workflow-edge: hsl(0, 0%, 32%);
-  --workflow-handle: hsl(0, 0%, 38%);
-  --workflow-handle-border: hsl(0, 0%, 50%);
+  --workflow-bg: hsl(220, 25%, 98%);
+  --workflow-surface: hsl(0, 0%, 100%);
+  --workflow-surface-hover: hsl(220, 20%, 96%);
+  --workflow-border: hsl(220, 15%, 88%);
+  --workflow-border-subtle: hsl(220, 15%, 92%);
+  --workflow-text: hsl(220, 20%, 20%);
+  --workflow-text-muted: hsl(220, 10%, 45%);
+  --workflow-text-subtle: hsl(220, 10%, 60%);
+  --workflow-node-bg: hsl(0, 0%, 100%);
+  --workflow-node-input: hsl(220, 20%, 97%);
+  --workflow-canvas-dot: hsl(220, 15%, 90%);
+  --workflow-edge: hsl(220, 15%, 70%);
+  --workflow-handle: hsl(220, 15%, 85%);
+  --workflow-handle-border: hsl(0, 0%, 100%);
 
-  /* 节点边框颜色 */
-  --node-ai-text-border: rgba(16, 185, 129, 0.5);
-  --node-ai-text-accent: hsl(158, 64%, 52%);
-  --node-ai-image-border: rgba(139, 92, 246, 0.5);
-  --node-ai-image-accent: hsl(263, 70%, 50%);
-  --node-condition-border: rgba(245, 158, 11, 0.5);
-  --node-condition-accent: hsl(43, 96%, 56%);
-  --node-memory-border: rgba(6, 182, 212, 0.5);
-  --node-memory-accent: hsl(187, 92%, 69%);
-  --node-github-border: rgba(161, 161, 170, 0.5);
-  --node-github-accent: hsl(240, 5%, 84%);
-  --node-output-border: rgba(244, 63, 94, 0.5);
-  --node-output-accent: hsl(350, 89%, 60%);
-  --node-text-input-border: rgba(59, 130, 246, 0.5);
-  --node-text-input-accent: hsl(217, 91%, 60%);
-  --node-merge-border: rgba(249, 115, 22, 0.5);
-  --node-merge-accent: hsl(25, 95%, 53%);
-  --node-group-border: rgba(113, 113, 122, 0.4);
-  --node-group-accent: hsl(240, 4%, 46%);
+  /* 节点默认颜色（统一灰色） */
+  --node-default-border: hsl(220, 15%, 80%);
+  --node-default-accent: hsl(220, 15%, 45%);
+
+  /* 节点边框颜色（保留用于特殊需求） */
+  --node-ai-text-border: hsl(160, 60%, 75%);
+  --node-ai-text-accent: hsl(160, 60%, 35%);
+  --node-ai-image-border: hsl(260, 60%, 75%);
+  --node-ai-image-accent: hsl(260, 60%, 40%);
+  --node-condition-border: hsl(40, 80%, 70%);
+  --node-condition-accent: hsl(40, 80%, 35%);
+  --node-memory-border: hsl(185, 60%, 70%);
+  --node-memory-accent: hsl(185, 60%, 35%);
+  --node-github-border: hsl(220, 15%, 80%);
+  --node-github-accent: hsl(220, 15%, 45%);
+  --node-output-border: hsl(350, 70%, 75%);
+  --node-output-accent: hsl(350, 70%, 40%);
+  --node-text-input-border: hsl(215, 70%, 75%);
+  --node-text-input-accent: hsl(215, 70%, 40%);
+  --node-merge-border: hsl(25, 80%, 70%);
+  --node-merge-accent: hsl(25, 80%, 35%);
+  --node-group-border: hsl(220, 10%, 85%);
+  --node-group-accent: hsl(220, 10%, 50%);
 
   /* 功能色 */
-  --color-emerald-400: hsl(158, 64%, 52%);
-  --color-emerald-500: hsl(160, 84%, 39%);
-  --color-emerald-600: hsl(161, 94%, 30%);
-  --color-rose-300: hsl(356, 100%, 82%);
-  --color-rose-400: hsl(350, 89%, 60%);
-  --color-rose-500: hsl(347, 77%, 50%);
-  --color-amber-500: hsl(38, 92%, 50%);
+  --color-emerald-400: hsl(160, 70%, 45%);
+  --color-emerald-500: hsl(160, 70%, 38%);
+  --color-emerald-600: hsl(160, 70%, 30%);
+  --color-rose-300: hsl(350, 80%, 80%);
+  --color-rose-400: hsl(350, 70%, 55%);
+  --color-rose-500: hsl(350, 70%, 50%);
+  --color-amber-500: hsl(40, 90%, 50%);
 
   /* 执行状态色 */
-  --execution-running: hsl(38, 92%, 50%);
-  --execution-success: hsl(160, 84%, 39%);
-  --execution-error: hsl(347, 77%, 50%);
-  --execution-waiting: hsl(0, 0%, 45%);
+  --execution-running: hsl(40, 90%, 50%);
+  --execution-success: hsl(160, 70%, 35%);
+  --execution-error: hsl(350, 70%, 50%);
+  --execution-waiting: hsl(220, 10%, 65%);
 }
 
 /* 全局 body 样式 */
@@ -107,7 +111,7 @@ body {
   background: var(--workflow-surface) !important;
   border: 1px solid var(--workflow-border) !important;
   border-radius: 0.5rem !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 .react-flow__controls-button {
@@ -131,6 +135,7 @@ body {
   background: var(--workflow-surface) !important;
   border: 1px solid var(--workflow-border) !important;
   border-radius: 0.5rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* React Flow 边样式 */

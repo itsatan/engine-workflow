@@ -1,8 +1,8 @@
 import { memo } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import type { NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import { BaseNode } from "../base-node";
 import type { MergeNodeData } from "@/lib/workflow-types";
-import "./nodes.css";
 
 function MergeNodeComponent({ data, selected, ...props }: NodeProps<MergeNodeData>) {
   return (
@@ -11,28 +11,14 @@ function MergeNodeComponent({ data, selected, ...props }: NodeProps<MergeNodeDat
         type="target"
         position={Position.Left}
         id="input-1"
-        style={{ top: "35%" }}
+        style={{ top: "30%" }}
       />
       <Handle
         type="target"
         position={Position.Left}
         id="input-2"
-        style={{ top: "65%" }}
+        style={{ top: "70%" }}
       />
-
-      <div className="node-field">
-        <div className="node-text-muted">Merge multiple inputs with:</div>
-        <div className="node-display" style={{ whiteSpace: "normal" }}>
-          {data.separator === "\n\n" ? "Double newline" :
-           data.separator === "\n" ? "Single newline" :
-           data.separator === "\n---\n" ? "Horizontal rule" :
-           data.separator === " " ? "Space" : "No separator"}
-        </div>
-        <div className="node-merge-labels">
-          <span>Input 1</span>
-          <span>Input 2</span>
-        </div>
-      </div>
     </BaseNode>
   );
 }

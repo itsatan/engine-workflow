@@ -170,6 +170,7 @@ export function WorkflowCanvas() {
         onConnect={handleConnect}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        zoomOnDoubleClick={false}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView

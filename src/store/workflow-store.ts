@@ -82,7 +82,10 @@ const defaultNodeData: Record<WorkflowNodeType, WorkflowNodeData> = {
   group: {
     label: "Group",
     color: "zinc",
-    content: "双击编辑此区域...\n\n可以在这里添加说明或备注。",
+    content: `## 📝 Group Notes
+
+Double-click to **edit** this area.
+`,
     width: 400,
     height: 300,
   },
@@ -244,7 +247,7 @@ interface WorkflowState {
   onConnect: (connection: Connection) => void;
 
   // Node operations
-  addNode: (nodeType: WorkflowNodeType) => void;
+  addNode: (nodeType: WorkflowNodeType, position?: { x: number; y: number }) => void;
   addNodeOnEdge: (edgeId: string, nodeType: WorkflowNodeType) => void;
   updateNode: (nodeId: string, data: Partial<WorkflowNode["data"]>) => void;
   setNodes: (nodes: WorkflowNode[]) => void;
@@ -293,22 +296,15 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   onNodesChange: (changes) => {
     set((state) => {
       const newNodes = applyNodeChanges(changes, state.nodes) as WorkflowNode[];
-
-      // Check for node selection
-      let newSelectedNode = state.selectedNode;
-      for (const change of changes) {
-        if (change.type === "select" && change.selected) {
-          const node = newNodes.find((n) => n.id === change.id);
-          if (node) {
-            newSelectedNode = node;
-          }
+      // Force group nodes to always stay at the lowest zIndex
+      for (let i = 0; i < newNodes.length; i++) {
+        if (newNodes[i].type === 'group' && newNodes[i].zIndex !== -1) {
+          newNodes[i] = { ...newNodes[i], zIndex: -1 };
         }
       }
-
       return {
         nodes: newNodes,
         hasChanges: true,
-        selectedNode: newSelectedNode,
       };
     });
   },
@@ -328,13 +324,17 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   },
 
   // Node operations
-  addNode: (nodeType) => {
+  addNode: (nodeType, position) => {
     const state = get();
-    const xOffset = 100 + state.nodes.length * 400;
+    const nodeW = nodeType === "group" ? 400 : 100;
+    const nodeH = nodeType === "group" ? 300 : 100;
+    const pos = position
+      ? { x: position.x - nodeW / 2, y: position.y - nodeH / 2 }
+      : { x: 100 + state.nodes.length * 400, y: 200 };
     const newNode: WorkflowNode = {
       id: `${nodeType}-${Date.now()}`,
       type: nodeType,
-      position: { x: xOffset, y: 200 },
+      position: pos,
       data: { ...defaultNodeData[nodeType] },
       ...(nodeType === "group"
         ? { style: { width: 400, height: 300 }, zIndex: -1 }
@@ -545,13 +545,39 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     // Run async execution
     (async () => {
       const { nodes, edges, workflowId } = get();
+      const nodeMap = new Map(nodes.map((n) => [n.id, n]));
       const nodeOutputs = new Map<string, string>();
+      const conditionResults = new Map<string, boolean>(); // Store condition node results
       const results: ExecutionResult[] = [];
       const edgeResults: EdgeExecutionData[] = [];
-      const sortedNodes = topologicalSort(nodes, edges).filter((n) => n.type !== 'group');
       let finalOutput = "";
 
-      for (const node of sortedNodes) {
+      // Find starting nodes (nodes with no incoming edges or incoming edges from group nodes)
+      const getIncomingEdges = (nodeId: string) =>
+        edges.filter((e) => e.target === nodeId && nodeMap.get(e.source)?.type !== 'group');
+
+      const getOutgoingEdges = (nodeId: string) =>
+        edges.filter((e) => e.source === nodeId);
+
+      // Get initial nodes (no incoming edges)
+      const queue: string[] = [];
+      for (const node of nodes) {
+        if (node.type === 'group') continue;
+        const incomingEdges = getIncomingEdges(node.id);
+        if (incomingEdges.length === 0) {
+          queue.push(node.id);
+        }
+      }
+
+      const executedNodes = new Set<string>();
+
+      while (queue.length > 0) {
+        const nodeId = queue.shift()!;
+        if (executedNodes.has(nodeId)) continue;
+
+        const node = nodeMap.get(nodeId);
+        if (!node || node.type === 'group') continue;
+
         // Mark current node as running
         set((s) => ({
           nodeExecutionStatus: { ...s.nodeExecutionStatus, [node.id]: 'running' as NodeExecutionStatus },
@@ -560,7 +586,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         const nodeStartTime = performance.now();
 
         // Get inputs from connected nodes
-        const incomingEdges = edges.filter((e) => e.target === node.id);
+        const incomingEdges = getIncomingEdges(node.id);
         const inputs: string[] = [];
         for (const edge of incomingEdges) {
           const output = nodeOutputs.get(edge.source);
@@ -569,7 +595,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
           }
           const edgeData: EdgeExecutionData = {
             edgeId: edge.id,
-            durationMs: Math.max(Math.round(Math.random() * 5 + 1), 1),
+            durationMs: Math.max(Math.round(Math.random() * 50 + 20), 20),
             dataSize: output?.length,
           };
           edgeResults.push(edgeData);
@@ -579,49 +605,59 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         }
         const combinedInput = inputs.join("\n\n");
         let output = "";
+        let nodeError = false;
 
-        // Simulate per-node async delay (200-600ms)
-        await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 400));
+        // Simulate per-node async delay (800-2000ms)
+        await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200));
 
-        switch (node.type as WorkflowNodeType) {
-          case "textInput": {
-            const data = node.data as TextInputNodeData;
-            output = data.text;
-            break;
+        // Simulate random failure for AI nodes (15% chance)
+        const shouldFail = (node.type === 'aiText' || node.type === 'aiImage') && Math.random() < 0.15;
+
+        if (shouldFail) {
+          nodeError = true;
+          output = `[Error] Simulated failure for ${node.type} node`;
+        } else {
+          switch (node.type as WorkflowNodeType) {
+            case "textInput": {
+              const data = node.data as TextInputNodeData;
+              output = data.text;
+              break;
+            }
+            case "github": {
+              output = `[Simulated] GitHub repository data for: ${(node.data as { githubUrl?: string }).githubUrl || "no URL"}`;
+              break;
+            }
+            case "aiText": {
+              const prompt = (node.data as { prompt: string }).prompt.replace(/\{\{input\}\}/g, combinedInput);
+              output = `[Simulated AI Response]\n\nPrompt: ${prompt.slice(0, 200)}...\n\nThis is a simulated response. Connect a real backend API to get actual AI-generated content.`;
+              break;
+            }
+            case "condition": {
+              const data = node.data as ConditionNodeData;
+              const condResult = evaluateCondition(data, combinedInput);
+              output = condResult ? "true" : "false";
+              conditionResults.set(node.id, condResult);
+              break;
+            }
+            case "merge": {
+              const data = node.data as MergeNodeData;
+              const separator = data.separator.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+              output = inputs.join(separator);
+              break;
+            }
+            case "memory": {
+              output = combinedInput || (node.data as { defaultValue?: string }).defaultValue || "";
+              break;
+            }
+            case "output": {
+              const data = node.data as OutputNodeData;
+              output = formatOutput(data, combinedInput);
+              finalOutput = output;
+              break;
+            }
+            default:
+              output = combinedInput;
           }
-          case "github": {
-            output = `[Simulated] GitHub repository data for: ${(node.data as { githubUrl?: string }).githubUrl || "no URL"}`;
-            break;
-          }
-          case "aiText": {
-            const prompt = (node.data as { prompt: string }).prompt.replace(/\{\{input\}\}/g, combinedInput);
-            output = `[Simulated AI Response]\n\nPrompt: ${prompt.slice(0, 200)}...\n\nThis is a simulated response. Connect a real backend API to get actual AI-generated content.`;
-            break;
-          }
-          case "condition": {
-            const data = node.data as ConditionNodeData;
-            const condResult = evaluateCondition(data, combinedInput);
-            output = condResult ? "true" : "false";
-            break;
-          }
-          case "merge": {
-            const data = node.data as MergeNodeData;
-            const separator = data.separator.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
-            output = inputs.join(separator);
-            break;
-          }
-          case "memory": {
-            output = combinedInput || (node.data as { defaultValue?: string }).defaultValue || "";
-            break;
-          }
-          case "output": {
-            const data = node.data as OutputNodeData;
-            output = formatOutput(data, combinedInput);
-            finalOutput = output;
-            break;
-          }
-          default:
-            output = combinedInput;
         }
 
         const durationMs = Math.round(performance.now() - nodeStartTime);
@@ -639,12 +675,63 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
         results.push(result);
         nodeOutputs.set(node.id, output);
+        executedNodes.add(node.id);
 
-        // Mark node as success and store result
+        // Mark node as success or error
         set((s) => ({
-          nodeExecutionStatus: { ...s.nodeExecutionStatus, [node.id]: 'success' as NodeExecutionStatus },
+          nodeExecutionStatus: {
+            ...s.nodeExecutionStatus,
+            [node.id]: (nodeError ? 'error' : 'success') as NodeExecutionStatus
+          },
           nodeExecutionResults: { ...s.nodeExecutionResults, [node.id]: result },
         }));
+
+        // If node failed, don't continue execution from this node
+        if (nodeError) continue;
+
+        // Get outgoing edges and determine which nodes to execute next
+        const outgoingEdges = getOutgoingEdges(node.id);
+        for (const edge of outgoingEdges) {
+          // For condition nodes, only follow the matching branch
+          if (node.type === 'condition') {
+            const condResult = conditionResults.get(node.id);
+            const sourceHandle = edge.sourceHandle;
+
+            // Skip if this edge doesn't match the condition result
+            if (sourceHandle === 'true' && !condResult) continue;
+            if (sourceHandle === 'false' && condResult) continue;
+          }
+
+          // Check if target node can be executed (all dependencies satisfied)
+          const targetId = edge.target;
+          const targetNode = nodeMap.get(targetId);
+          if (!targetNode || targetNode.type === 'group') continue;
+
+          // Check if all incoming edges to target have been processed
+          const targetIncomingEdges = getIncomingEdges(targetId);
+
+          // For merge nodes, we only need at least one input to be ready
+          // This allows conditional branches to work properly
+          if (targetNode.type === 'merge') {
+            const hasAnyInput = targetIncomingEdges.some((e) =>
+              nodeOutputs.has(e.source)
+            );
+            if (!hasAnyInput) continue;
+            // Add to queue if not already there
+            if (!executedNodes.has(targetId) && !queue.includes(targetId)) {
+              queue.push(targetId);
+            }
+            continue;
+          }
+
+          const allDependenciesMet = targetIncomingEdges.every((e) =>
+            executedNodes.has(e.source) || nodeMap.get(e.source)?.type === 'group'
+          );
+
+          if (allDependenciesMet && !executedNodes.has(targetId) && !queue.includes(targetId)) {
+            queue.push(targetId);
+          }
+        }
       }
 
       if (!finalOutput && results.length > 0) {

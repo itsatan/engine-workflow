@@ -51,8 +51,8 @@ export function WorkflowEdge({
       />
 
       <EdgeLabelRenderer>
-        {/* Execution time label */}
-        {edgeData && !isExecuting && (
+        {/* Execution time label - 显示边数据后立即显示 */}
+        {edgeData && (
           <div
             className="custom-edge__time-label"
             style={{

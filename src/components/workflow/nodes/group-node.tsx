@@ -1,7 +1,10 @@
 import { memo, useState, useCallback, useRef, useEffect } from "react";
 import type { NodeProps } from "@xyflow/react";
-import { NodeResizer, useReactFlow, useOnViewportChange } from "@xyflow/react";
+import { NodeResizer, useReactFlow } from "@xyflow/react";
 import { X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import type { GroupNodeData } from "@/lib/workflow-types";
 import { useWorkflowStore } from "@/store/workflow-store";
 import "./group-node.css";
@@ -21,22 +24,19 @@ function GroupNodeComponent({ id, data: rawData, selected }: NodeProps) {
     }
   }, [isEditing]);
 
-  // Keep zIndex low when selected (but not editing)
-  // React Flow automatically raises zIndex when selecting, we need to override this
+  // Keep zIndex low always (only raise on double-click edit)
   useEffect(() => {
-    if (!isEditing) {
-      const allNodes = getNodes();
-      const currentNode = allNodes.find((n) => n.id === id);
-      // Only update if zIndex is not already -1
-      if (currentNode && currentNode.zIndex !== -1) {
-        setNodes(
-          allNodes.map((n) =>
-            n.id === id ? { ...n, zIndex: -1 } : n
-          )
-        );
-      }
+    const allNodes = getNodes();
+    const currentNode = allNodes.find((n) => n.id === id);
+    // Only update if zIndex is not already -1
+    if (currentNode && currentNode.zIndex !== -1) {
+      setNodes(
+        allNodes.map((n) =>
+          n.id === id ? { ...n, zIndex: -1 } : n
+        )
+      );
     }
-  }, [selected, isEditing, id, getNodes, setNodes]);
+  }, [selected, id, getNodes, setNodes]);
 
   // Click outside to exit edit mode (using click event in capture phase)
   useEffect(() => {
@@ -45,14 +45,7 @@ function GroupNodeComponent({ id, data: rawData, selected }: NodeProps) {
     function handleClickOutside(e: MouseEvent) {
       // Check if click is outside the node
       if (nodeRef.current && !nodeRef.current.contains(e.target as Node)) {
-        setIsEditing(false);
-        // Restore zIndex to default (lowest)
-        const allNodes = getNodes();
-        setNodes(
-          allNodes.map((n) =>
-            n.id === id ? { ...n, zIndex: -1 } : n
-          )
-        );
+        exitEditMode();
       }
     }
 
@@ -64,20 +57,16 @@ function GroupNodeComponent({ id, data: rawData, selected }: NodeProps) {
     };
   }, [isEditing, id, getNodes, setNodes]);
 
-  // Exit edit mode when viewport changes (pan/zoom)
-  useOnViewportChange({
-    onChange: () => {
-      if (isEditing) {
-        setIsEditing(false);
-        const allNodes = getNodes();
-        setNodes(
-          allNodes.map((n) =>
-            n.id === id ? { ...n, zIndex: -1 } : n
-          )
-        );
-      }
-    },
-  });
+  // Exit edit mode helper
+  const exitEditMode = useCallback(() => {
+    setIsEditing(false);
+    const allNodes = getNodes();
+    setNodes(
+      allNodes.map((n) =>
+        n.id === id ? { ...n, zIndex: -1, draggable: true } : n
+      )
+    );
+  }, [id, getNodes, setNodes]);
 
   const handleDelete = useCallback(
     (e: React.MouseEvent) => {
@@ -94,20 +83,36 @@ function GroupNodeComponent({ id, data: rawData, selected }: NodeProps) {
     [id, data, updateNode]
   );
 
-  // Double-click: enter edit mode and raise zIndex
+  // Double-click: enter edit mode and raise zIndex, disable dragging
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      e.preventDefault();
       setIsEditing(true);
       const allNodes = getNodes();
       setNodes(
         allNodes.map((n) =>
-          n.id === id ? { ...n, zIndex: 1000 } : n
+          n.id === id ? { ...n, zIndex: 1000, draggable: false } : n
         )
       );
     },
     [id, getNodes, setNodes]
   );
+
+  // Prevent drag when in edit mode
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (isEditing) {
+        e.stopPropagation();
+      }
+    },
+    [isEditing]
+  );
+
+  // Prevent all mouse/pointer events from bubbling when in edit mode
+  const stopPropagation = useCallback((e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <>
@@ -122,37 +127,47 @@ function GroupNodeComponent({ id, data: rawData, selected }: NodeProps) {
         ref={nodeRef}
         className={`group-node${selected ? " group-node--selected" : ""}${isEditing ? " group-node--editing" : ""}`}
         onDoubleClick={handleDoubleClick}
+        onMouseDown={handleMouseDown}
       >
         {/* Header bar */}
         <div className="group-node__header">
           <span className="group-node__label">{data.label || "Group"}</span>
+          <div className="group-node__header-spacer" />
           <button
             type="button"
             onClick={handleDelete}
             className="group-node__delete"
             aria-label="Delete group"
           >
-            <X size={14} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Edit overlay - visible on double-click */}
         {isEditing && (
-          <div className="group-node__edit-overlay">
+          <div
+            className="group-node__edit-overlay nodrag nowheel nopan"
+            onMouseDown={stopPropagation}
+            onPointerDown={stopPropagation}
+          >
             <textarea
               ref={textareaRef}
               value={data.content || ""}
               onChange={handleContentChange}
-              className="group-node__textarea"
-              placeholder="Type notes here..."
+              className="group-node__textarea nodrag nowheel nopan"
+              placeholder="Type notes here... (Markdown supported)"
+              onMouseDown={stopPropagation}
+              onPointerDown={stopPropagation}
             />
           </div>
         )}
 
-        {/* Content preview when not editing */}
+        {/* Content preview when not editing - render as Markdown */}
         {!isEditing && data.content && (
           <div className="group-node__content-preview">
-            {data.content}
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+              {data.content}
+            </ReactMarkdown>
           </div>
         )}
       </div>

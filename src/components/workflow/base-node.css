@@ -1,68 +1,146 @@
+/* ==========================================
+   Compact Node Style - 100x100px (Light Theme)
+   ========================================== */
+
 .base-node {
-  min-width: 280px;
-  border-radius: 0.5rem;
+  width: 100px;
+  height: 100px;
+  border-radius: 0.625rem;
   border-width: 2px;
   border-style: solid;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  transition: colors 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   background-color: var(--workflow-node-bg);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .base-node--selected {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 0 6px hsl(220, 15%, 90%),
+    0 0 0 9px hsl(220, 15%, 95%),
+    0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-.base-node__header {
+/* ==========================================
+   Node Toolbar - 悬浮时显示
+   ========================================== */
+
+.base-node__toolbar {
+  position: absolute;
+  top: -48px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--workflow-border-subtle);
+  gap: 4px;
+  padding: 5px 6px;
+  background: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 10;
 }
 
-.base-node__icon {
-  display: flex;
-  align-items: center;
+.base-node__toolbar::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
 }
 
-.base-node__label {
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.875rem;
-  font-weight: 500;
-  flex: 1;
-  color: var(--workflow-text);
+.base-node:hover .base-node__toolbar,
+.base-node__toolbar:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(2px);
 }
 
-.base-node__delete {
-  padding: 0.25rem;
-  border-radius: 0.25rem;
+.base-node__toolbar-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: none;
+  border-radius: 4px;
   background: transparent;
   color: var(--workflow-text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: all 0.2s ease;
+  justify-content: center;
+  transition: all 0.12s ease;
 }
 
-.base-node__delete:hover {
-  background-color: var(--workflow-surface-hover);
+.base-node__toolbar-btn:hover {
+  background: var(--workflow-surface-hover);
   color: var(--workflow-text);
 }
 
-.base-node__content {
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.base-node__toolbar-btn--danger:hover {
+  background: hsla(350, 70%, 50%, 0.1);
+  color: var(--color-rose-500);
 }
 
-/* Handle styles */
+.base-node__toolbar-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--workflow-border);
+  margin: 0 2px;
+}
+
+/* Icon container */
+.base-node__icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 0.625rem;
+  background: linear-gradient(
+    135deg,
+    hsl(220, 20%, 97%) 0%,
+    hsl(220, 20%, 95%) 100%
+  );
+}
+
+.base-node__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Node name label (below the node) */
+.base-node__name {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--workflow-text);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+/* Handle styles - 增大句柄圆点 */
 .base-node .react-flow__handle {
-  width: 0.75rem !important;
-  height: 0.75rem !important;
+  width: 0.875rem !important;
+  height: 0.875rem !important;
   background-color: var(--workflow-handle) !important;
   border: 2px solid var(--workflow-handle-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Condition node true/false handles */
@@ -76,39 +154,53 @@
   border-color: var(--color-rose-300) !important;
 }
 
+/* ==========================================
+   Condition Node T/F Labels - 简洁文字样式
+   ========================================== */
+
 .base-node__handle-label {
   position: absolute;
-  right: -40px;
-  font-size: 0.75rem;
+  right: -24px;
+  font-size: 0.875rem;
   font-family: ui-monospace, SFMono-Regular, monospace;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  pointer-events: none;
 }
 
 .base-node__handle-label--true {
-  top: 35%;
-  color: var(--color-emerald-400);
+  top: calc(35% - 7px);
+  color: var(--color-emerald-500);
 }
 
 .base-node__handle-label--false {
-  top: 65%;
-  color: var(--color-rose-400);
+  top: calc(65% - 7px);
+  color: var(--color-rose-500);
 }
 
-/* Execution status border animations */
+/* Execution status styles */
 .base-node--running {
   animation: node-pulse 1.5s ease-in-out infinite;
 }
 
+/* 边框颜色通过style设置，不需要额外样式 */
 .base-node--success {
-  box-shadow: 0 0 0 1px var(--execution-success), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .base-node--error {
-  box-shadow: 0 0 0 1px var(--execution-error), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(245, 158, 11, 0.4),
+      0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(245, 158, 11, 0),
+      0 1px 3px rgba(0, 0, 0, 0.06);
+  }
 }
 
 @keyframes spin {
@@ -120,9 +212,11 @@
   animation: spin 1s linear infinite;
 }
 
-/* Status icons */
+/* Status icons - positioned at bottom-right */
 .base-node__status {
-  flex-shrink: 0;
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
 }
 
 .base-node__status--running {
@@ -141,14 +235,27 @@
   color: var(--execution-waiting);
 }
 
-/* Execution time display */
+/* Hide content area - not needed for compact nodes */
+.base-node__content {
+  display: none;
+}
+
+/* Hide execution time display */
 .base-node__execution-time {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  border-top: 1px solid var(--workflow-border-subtle);
-  font-size: 0.625rem;
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  color: var(--color-emerald-400);
+  display: none;
+}
+
+/* Hide old header */
+.base-node__header {
+  display: none;
+}
+
+/* Hide old label */
+.base-node__label {
+  display: none;
+}
+
+/* Hide old delete button */
+.base-node__delete {
+  display: none;
 }

@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Plus,
 } from "lucide-react";
+import { useReactFlow } from "@xyflow/react";
 import { TemplatesDialog } from "./templates-dialog";
 import { AddNodeDialog } from "./add-node-dialog";
 import { useWorkflowStore } from "@/store/workflow-store";
@@ -32,6 +33,7 @@ export function WorkflowToolbar() {
     hasChanges,
   } = useWorkflowStore();
 
+  const { screenToFlowPosition } = useReactFlow();
   const [isSaving, setIsSaving] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showAddNode, setShowAddNode] = useState(false);
@@ -84,7 +86,10 @@ export function WorkflowToolbar() {
             isOpen={showAddNode}
             onClose={() => setShowAddNode(false)}
             onAddNode={(nodeType) => {
-              addNode(nodeType);
+              const centerX = window.innerWidth / 2;
+              const centerY = window.innerHeight * 0.4;
+              const position = screenToFlowPosition({ x: centerX, y: centerY });
+              addNode(nodeType, position);
               setShowAddNode(false);
             }}
           />
