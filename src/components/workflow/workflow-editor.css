@@ -1,0 +1,13 @@
+.workflow-editor {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--workflow-bg);
+  transition: colors 0.2s ease;
+}
+
+.workflow-editor__body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}

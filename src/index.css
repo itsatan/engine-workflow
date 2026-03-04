@@ -1,0 +1,136 @@
+/* ==========================================
+   全局样式 - FlowForge Engine
+   暗色主题（固定，不支持切换）
+   ========================================== */
+
+/* Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* CSS 变量 - 暗色主题 */
+:root {
+  /* 基础色 */
+  --background: hsl(0, 0%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+
+  /* 工作流编辑器变量 */
+  --workflow-bg: hsl(0, 0%, 4%);
+  --workflow-surface: hsl(0, 0%, 7%);
+  --workflow-surface-hover: hsl(0, 0%, 10%);
+  --workflow-border: hsl(0, 0%, 15%);
+  --workflow-border-subtle: hsl(0, 0%, 18%);
+  --workflow-text: hsl(0, 0%, 90%);
+  --workflow-text-muted: hsl(0, 0%, 64%);
+  --workflow-text-subtle: hsl(0, 0%, 45%);
+  --workflow-node-bg: hsl(0, 0%, 7%);
+  --workflow-node-input: hsl(0, 0%, 12%);
+  --workflow-canvas-dot: hsl(0, 0%, 16%);
+  --workflow-edge: hsl(0, 0%, 32%);
+  --workflow-handle: hsl(0, 0%, 38%);
+  --workflow-handle-border: hsl(0, 0%, 50%);
+
+  /* 节点边框颜色 */
+  --node-ai-text-border: rgba(16, 185, 129, 0.5);
+  --node-ai-text-accent: hsl(158, 64%, 52%);
+  --node-ai-image-border: rgba(139, 92, 246, 0.5);
+  --node-ai-image-accent: hsl(263, 70%, 50%);
+  --node-condition-border: rgba(245, 158, 11, 0.5);
+  --node-condition-accent: hsl(43, 96%, 56%);
+  --node-memory-border: rgba(6, 182, 212, 0.5);
+  --node-memory-accent: hsl(187, 92%, 69%);
+  --node-github-border: rgba(161, 161, 170, 0.5);
+  --node-github-accent: hsl(240, 5%, 84%);
+  --node-output-border: rgba(244, 63, 94, 0.5);
+  --node-output-accent: hsl(350, 89%, 60%);
+  --node-text-input-border: rgba(59, 130, 246, 0.5);
+  --node-text-input-accent: hsl(217, 91%, 60%);
+  --node-merge-border: rgba(249, 115, 22, 0.5);
+  --node-merge-accent: hsl(25, 95%, 53%);
+
+  /* 功能色 */
+  --color-emerald-400: hsl(158, 64%, 52%);
+  --color-emerald-500: hsl(160, 84%, 39%);
+  --color-emerald-600: hsl(161, 94%, 30%);
+  --color-rose-300: hsl(356, 100%, 82%);
+  --color-rose-400: hsl(350, 89%, 60%);
+  --color-rose-500: hsl(347, 77%, 50%);
+  --color-amber-500: hsl(38, 92%, 50%);
+}
+
+/* 全局 body 样式 */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* React Flow 节点包装 - 移除默认白色背景 */
+.react-flow__node {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.react-flow__node-output,
+.react-flow__node-input,
+.react-flow__node-default,
+.react-flow__node-custom {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* React Flow 控制器样式 */
+.react-flow__controls {
+  background: var(--workflow-surface) !important;
+  border: 1px solid var(--workflow-border) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.react-flow__controls-button {
+  background: var(--workflow-surface) !important;
+  border-bottom: 1px solid var(--workflow-border) !important;
+  fill: var(--workflow-text-muted) !important;
+  transition: all 0.15s ease !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--workflow-surface-hover) !important;
+  fill: var(--workflow-text) !important;
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+
+/* React Flow 小地图样式 */
+.react-flow__minimap {
+  background: var(--workflow-surface) !important;
+  border: 1px solid var(--workflow-border) !important;
+  border-radius: 0.5rem !important;
+}
+
+/* React Flow 边样式 */
+.react-flow__edge-path {
+  stroke: var(--workflow-edge) !important;
+}
+
+/* React Flow 隐藏归属标签 */
+.react-flow__attribution {
+  display: none !important;
+}

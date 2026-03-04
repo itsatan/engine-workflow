@@ -1,0 +1,304 @@
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  z-index: 50;
+  background-color: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  min-width: 260px;
+  transition: colors 0.2s ease;
+}
+
+.dropdown-menu__header {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--workflow-border);
+}
+
+.dropdown-menu__title {
+  font-size: 0.625rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--workflow-text-muted);
+}
+
+.dropdown-menu__list {
+  padding: 0.25rem 0;
+}
+
+.dropdown-menu__item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-menu__item:hover {
+  background-color: var(--workflow-surface-hover);
+}
+
+.dropdown-menu__item-icon {
+  color: var(--workflow-text-muted);
+  margin-top: 0.125rem;
+}
+
+.dropdown-menu__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-menu__item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--workflow-text);
+}
+
+.dropdown-menu__item-desc {
+  font-size: 0.75rem;
+  color: var(--workflow-text-muted);
+  margin-top: 0.125rem;
+}
+
+/* Modal dialog */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  background-color: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 1rem;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  transition: colors 0.2s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--workflow-border);
+}
+
+.modal-header h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--workflow-text);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-close {
+  padding: 0.375rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  color: var(--workflow-text-muted);
+  display: flex;
+  align-items: center;
+  transition: colors 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: var(--workflow-surface-hover);
+}
+
+.modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+}
+
+/* Workflow list item */
+.workflow-list-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.workflow-list-item:hover {
+  background-color: var(--workflow-node-input);
+  border-color: var(--workflow-border);
+}
+
+.workflow-list-item__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.workflow-list-item__info {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+.workflow-list-item__name {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875rem;
+  color: var(--workflow-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-list-item__desc {
+  font-size: 0.75rem;
+  color: var(--workflow-text-muted);
+  margin-top: 0.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-list-item__date {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--workflow-text-subtle);
+}
+
+.workflow-list-item__delete {
+  padding: 0.375rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  color: var(--workflow-text-muted);
+  opacity: 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.workflow-list-item:hover .workflow-list-item__delete {
+  opacity: 1;
+}
+
+.workflow-list-item__delete:hover {
+  color: var(--color-rose-400);
+  background-color: var(--workflow-surface-hover);
+}
+
+.workflow-list-item__delete:disabled {
+  color: var(--workflow-text-subtle);
+}
+
+/* History item */
+.history-item {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+  transition: colors 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.history-item:hover {
+  background-color: var(--workflow-node-input);
+  border-color: var(--workflow-border);
+}
+
+.history-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.history-item__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875rem;
+  color: var(--workflow-text);
+  text-transform: capitalize;
+}
+
+.history-item__time {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  color: var(--workflow-text-muted);
+}
+
+.history-item__preview {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  color: var(--workflow-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.25rem;
+}
+
+/* Center text */
+.modal-empty {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--workflow-text-muted);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875rem;
+}
+
+.modal-empty-sub {
+  font-size: 0.75rem;
+  color: var(--workflow-text-subtle);
+  margin-top: 0.25rem;
+}
+
+/* Loading center */
+.modal-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+}

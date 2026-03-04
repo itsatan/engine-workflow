@@ -1,0 +1,295 @@
+.output-panel {
+  width: 24rem;
+  background-color: var(--workflow-bg);
+  border-left: 1px solid var(--workflow-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: colors 0.2s ease;
+}
+
+.output-panel__header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--workflow-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.output-panel__header-info h2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--workflow-text);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.output-panel__header-info p {
+  font-size: 0.75rem;
+  color: var(--workflow-text-muted);
+  margin-top: 0.125rem;
+}
+
+.output-panel__close {
+  padding: 0.375rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  color: var(--workflow-text-muted);
+  display: flex;
+  align-items: center;
+  transition: colors 0.2s ease;
+}
+
+.output-panel__close:hover {
+  background-color: var(--workflow-surface-hover);
+}
+
+/* Loading state */
+.output-panel__loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.output-panel__loading-inner {
+  text-align: center;
+}
+
+.output-panel__loading-text {
+  font-size: 0.875rem;
+  color: var(--workflow-text-muted);
+  margin-top: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+/* View toggle */
+.output-panel__view-toggle {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--workflow-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.output-panel__view-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: colors 0.2s ease;
+  color: var(--workflow-text-muted);
+}
+
+.output-panel__view-btn:hover {
+  color: var(--workflow-text);
+}
+
+.output-panel__view-btn--active {
+  background-color: var(--workflow-surface);
+  color: var(--workflow-text);
+}
+
+/* Content area */
+.output-panel__content {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+}
+
+/* Markdown rendering styles */
+.output-panel__markdown {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--workflow-text);
+}
+
+.output-panel__markdown h1,
+.output-panel__markdown h2,
+.output-panel__markdown h3,
+.output-panel__markdown h4 {
+  color: var(--workflow-text);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.output-panel__markdown h1 { font-size: 1.5rem; }
+.output-panel__markdown h2 { font-size: 1.25rem; }
+.output-panel__markdown h3 { font-size: 1.1rem; }
+
+.output-panel__markdown p {
+  margin-bottom: 0.75rem;
+  color: var(--workflow-text);
+}
+
+.output-panel__markdown code {
+  color: var(--color-emerald-400);
+  background-color: var(--workflow-node-input);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.output-panel__markdown pre {
+  background-color: var(--workflow-surface);
+  border: 1px solid var(--workflow-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.output-panel__markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.output-panel__markdown a {
+  color: var(--color-emerald-400);
+}
+
+.output-panel__markdown ul,
+.output-panel__markdown ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--workflow-text);
+}
+
+.output-panel__markdown li {
+  margin-bottom: 0.25rem;
+}
+
+.output-panel__markdown blockquote {
+  border-left: 3px solid var(--workflow-border);
+  padding-left: 1rem;
+  color: var(--workflow-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.output-panel__markdown hr {
+  border: none;
+  border-top: 1px solid var(--workflow-border);
+  margin: 1rem 0;
+}
+
+.output-panel__raw {
+  font-size: 0.875rem;
+  color: var(--workflow-text);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* Action buttons */
+.output-panel__actions {
+  padding: 0.75rem;
+  border-top: 1px solid var(--workflow-border);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.output-panel__action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  border: none;
+  cursor: pointer;
+  transition: colors 0.2s ease;
+}
+
+.output-panel__action-btn--copy {
+  background-color: var(--workflow-surface);
+  color: var(--workflow-text);
+}
+
+.output-panel__action-btn--copy:hover {
+  background-color: var(--workflow-surface-hover);
+}
+
+.output-panel__action-btn--download {
+  background-color: var(--color-emerald-600);
+  color: white;
+}
+
+.output-panel__action-btn--download:hover {
+  background-color: var(--color-emerald-500);
+}
+
+/* Execution log */
+.output-panel__log {
+  padding: 0.75rem;
+  border-top: 1px solid var(--workflow-border);
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.output-panel__log-title {
+  font-size: 0.75rem;
+  color: var(--workflow-text-muted);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  margin-bottom: 0.5rem;
+}
+
+.output-panel__log-item {
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: colors 0.2s ease;
+}
+
+.output-panel__log-item--ok {
+  background-color: var(--workflow-surface);
+  color: var(--workflow-text-muted);
+}
+
+.output-panel__log-item--error {
+  background-color: rgba(244, 63, 94, 0.1);
+  color: var(--color-rose-400);
+}
+
+.output-panel__log-item-type {
+  color: var(--workflow-text-subtle);
+}
+
+/* Empty state */
+.output-panel__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.output-panel__empty-inner {
+  text-align: center;
+  color: var(--workflow-text-subtle);
+}
+
+.output-panel__empty-icon {
+  margin: 0 auto 0.75rem;
+  opacity: 0.3;
+}
+
+.output-panel__empty-text {
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.output-panel__empty-sub {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}

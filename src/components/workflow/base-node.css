@@ -1,0 +1,94 @@
+.base-node {
+  min-width: 280px;
+  border-radius: 0.5rem;
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  transition: colors 0.2s ease;
+  background-color: var(--workflow-node-bg);
+}
+
+.base-node--selected {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.base-node__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--workflow-border-subtle);
+}
+
+.base-node__icon {
+  display: flex;
+  align-items: center;
+}
+
+.base-node__label {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
+  color: var(--workflow-text);
+}
+
+.base-node__delete {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--workflow-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.base-node__delete:hover {
+  background-color: var(--workflow-surface-hover);
+  color: var(--workflow-text);
+}
+
+.base-node__content {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Handle styles */
+.base-node .react-flow__handle {
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+  background-color: var(--workflow-handle) !important;
+  border: 2px solid var(--workflow-handle-border) !important;
+}
+
+/* Condition node true/false handles */
+.base-node__handle--true {
+  background-color: var(--color-emerald-500) !important;
+  border-color: var(--color-emerald-400) !important;
+}
+
+.base-node__handle--false {
+  background-color: var(--color-rose-500) !important;
+  border-color: var(--color-rose-300) !important;
+}
+
+.base-node__handle-label {
+  position: absolute;
+  right: -40px;
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.base-node__handle-label--true {
+  top: 35%;
+  color: var(--color-emerald-400);
+}
+
+.base-node__handle-label--false {
+  top: 65%;
+  color: var(--color-rose-400);
+}
