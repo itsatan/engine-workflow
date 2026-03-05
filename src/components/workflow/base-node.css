@@ -231,6 +231,10 @@
   color: var(--execution-error);
 }
 
+.base-node__status--warning {
+  color: var(--execution-warning);
+}
+
 .base-node__status--waiting {
   color: var(--execution-waiting);
 }
@@ -258,4 +262,65 @@
 /* Hide old delete button */
 .base-node__delete {
   display: none;
+}
+
+/* ==========================================
+   Add Handle Button - 右侧添加按钮
+   ========================================== */
+
+.base-node__add-handle {
+  position: absolute;
+  right: -0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.base-node__add-handle--true {
+  top: 35%;
+}
+
+.base-node__add-handle--false {
+  top: 65%;
+}
+
+.base-node__add-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: var(--workflow-surface);
+  border: 2px solid var(--workflow-border);
+  color: var(--workflow-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.base-node__add-btn:hover {
+  background-color: var(--color-emerald-500);
+  border-color: var(--color-emerald-400);
+  color: white;
+  transform: scale(1.15);
+}
+
+.base-node__add-btn--true {
+  border-color: var(--color-emerald-400);
+}
+
+.base-node__add-btn--true:hover {
+  background-color: var(--color-emerald-500);
+  border-color: var(--color-emerald-400);
+}
+
+.base-node__add-btn--false {
+  border-color: var(--color-rose-300);
+}
+
+.base-node__add-btn--false:hover {
+  background-color: var(--color-rose-500);
+  border-color: var(--color-rose-400);
 }

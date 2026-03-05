@@ -134,8 +134,8 @@ const initialNodes: WorkflowNode[] = [
 ];
 
 const initialEdges: Edge[] = [
-  { id: "e1", source: "github-1", target: "ai-1", type: "workflow", animated: true },
-  { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: true },
+  { id: "e1", source: "github-1", target: "ai-1", type: "workflow", animated: false},
+  { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: false},
 ];
 
 // Topological sort for execution order
@@ -249,6 +249,7 @@ interface WorkflowState {
   // Node operations
   addNode: (nodeType: WorkflowNodeType, position?: { x: number; y: number }) => void;
   addNodeOnEdge: (edgeId: string, nodeType: WorkflowNodeType) => void;
+  addNodeAfterNode: (sourceNodeId: string, nodeType: WorkflowNodeType, sourceHandleId?: string) => void;
   updateNode: (nodeId: string, data: Partial<WorkflowNode["data"]>) => void;
   setNodes: (nodes: WorkflowNode[]) => void;
   setEdges: (edges: Edge[]) => void;
@@ -318,7 +319,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   onConnect: (connection) => {
     set((state) => ({
-      edges: addEdge({ ...connection, type: "workflow", animated: true }, state.edges),
+      edges: addEdge({ ...connection, type: "workflow", animated: false}, state.edges),
       hasChanges: true,
     }));
   },
@@ -375,7 +376,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       sourceHandle: edge.sourceHandle ?? undefined,
       target: newNode.id,
       type: "workflow",
-      animated: true,
+      animated: false,
     };
     const newEdge2: Edge = {
       id: `e-${newNode.id}-${edge.target}`,
@@ -383,12 +384,50 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       target: edge.target,
       targetHandle: edge.targetHandle ?? undefined,
       type: "workflow",
-      animated: true,
+      animated: false,
     };
 
     set({
       nodes: [...state.nodes, newNode],
       edges: [...newEdges, newEdge1, newEdge2],
+      hasChanges: true,
+    });
+  },
+
+  addNodeAfterNode: (sourceNodeId, nodeType, sourceHandleId) => {
+    const state = get();
+    const sourceNode = state.nodes.find((n) => n.id === sourceNodeId);
+    if (!sourceNode) return;
+
+    // 新节点放在源节点右侧 400px 处
+    const newX = sourceNode.position.x + 400;
+    const newY = sourceNode.position.y;
+
+    const newNodeId = `${nodeType}-${Date.now()}`;
+    const newNode: WorkflowNode = {
+      id: newNodeId,
+      type: nodeType,
+      position: { x: newX, y: newY },
+      data: { ...defaultNodeData[nodeType] },
+      ...(nodeType === "group"
+        ? { style: { width: 400, height: 300 }, zIndex: -1 }
+        : {}),
+    };
+
+    // 创建从源节点到新节点的边
+    const newEdge: Edge = {
+      id: `e-${sourceNodeId}-${newNodeId}`,
+      source: sourceNodeId,
+      sourceHandle: sourceHandleId ?? null,
+      target: newNodeId,
+      targetHandle: null,
+      type: "workflow",
+      animated: false,
+    };
+
+    set({
+      nodes: [...state.nodes, newNode],
+      edges: [...state.edges, newEdge],
       hasChanges: true,
     });
   },
@@ -593,29 +632,26 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
           if (output !== undefined) {
             inputs.push(output);
           }
-          const edgeData: EdgeExecutionData = {
-            edgeId: edge.id,
-            durationMs: Math.max(Math.round(Math.random() * 50 + 20), 20),
-            dataSize: output?.length,
-          };
-          edgeResults.push(edgeData);
-          set((s) => ({
-            edgeExecutionData: { ...s.edgeExecutionData, [edge.id]: edgeData },
-          }));
         }
         const combinedInput = inputs.join("\n\n");
         let output = "";
         let nodeError = false;
+        let nodeWarning = false;
 
         // Simulate per-node async delay (800-2000ms)
         await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200));
 
         // Simulate random failure for AI nodes (15% chance)
         const shouldFail = (node.type === 'aiText' || node.type === 'aiImage') && Math.random() < 0.15;
+        // Simulate warning for memory/condition nodes (15% chance)
+        const shouldWarn = (node.type === 'memory' || node.type === 'condition') && !shouldFail && Math.random() < 0.15;
 
         if (shouldFail) {
           nodeError = true;
           output = `[Error] Simulated failure for ${node.type} node`;
+        } else if (shouldWarn) {
+          nodeWarning = true;
+          output = `[Warning] Simulated warning for ${node.type} node: partial data`;
         } else {
           switch (node.type as WorkflowNodeType) {
             case "textInput": {
@@ -677,20 +713,35 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         nodeOutputs.set(node.id, output);
         executedNodes.add(node.id);
 
-        // Mark node as success or error
+        // Mark node as success, warning, or error
+        const nodeStatus: NodeExecutionStatus = nodeError ? 'error' : nodeWarning ? 'warning' : 'success';
         set((s) => ({
           nodeExecutionStatus: {
             ...s.nodeExecutionStatus,
-            [node.id]: (nodeError ? 'error' : 'success') as NodeExecutionStatus
+            [node.id]: nodeStatus
           },
           nodeExecutionResults: { ...s.nodeExecutionResults, [node.id]: result },
         }));
+
+        // 为出边设置执行数据，链路颜色与源节点执行状态一致
+        const outgoingEdges = getOutgoingEdges(node.id);
+        const outEdgeStatus: 'success' | 'warning' | 'error' = nodeError ? 'error' : nodeWarning ? 'warning' : 'success';
+        for (const edge of outgoingEdges) {
+          const outEdgeData: EdgeExecutionData = {
+            edgeId: edge.id,
+            durationMs: Math.max(Math.round(Math.random() * 50 + 20), 20),
+            status: outEdgeStatus,
+          };
+          edgeResults.push(outEdgeData);
+          set((s) => ({
+            edgeExecutionData: { ...s.edgeExecutionData, [edge.id]: outEdgeData },
+          }));
+        }
 
         // If node failed, don't continue execution from this node
         if (nodeError) continue;
 
         // Get outgoing edges and determine which nodes to execute next
-        const outgoingEdges = getOutgoingEdges(node.id);
         for (const edge of outgoingEdges) {
           // For condition nodes, only follow the matching branch
           if (node.type === 'condition') {

@@ -6,7 +6,6 @@
   font-size: 0.75rem;
   font-family: ui-monospace, SFMono-Regular, monospace;
   font-weight: 500;
-  color: var(--color-emerald-600);
   white-space: nowrap;
   z-index: 10;
   pointer-events: none;
@@ -38,4 +37,32 @@
   border-color: var(--color-emerald-400);
   color: white;
   transform: scale(1.1);
+}
+
+/* 删除按钮 */
+.custom-edge__delete-btn-wrapper {
+  z-index: 10;
+  padding: 0.75rem;
+}
+
+.custom-edge__delete-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: var(--workflow-surface);
+  border: 2px solid var(--workflow-border);
+  color: var(--workflow-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.custom-edge__delete-btn:hover {
+  background-color: var(--color-rose-500);
+  border-color: var(--color-rose-400);
+  color: white;
+  transform: scale(1.15);
 }

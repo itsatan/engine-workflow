@@ -60,8 +60,8 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "github-1", target: "ai-1", type: "workflow", animated: true },
-      { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: true },
+      { id: "e1", source: "github-1", target: "ai-1", type: "workflow", animated: false },
+      { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: false },
     ],
   },
   {
@@ -133,10 +133,10 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "github-1", target: "merge-1", targetHandle: "input-1", type: "workflow", animated: true },
-      { id: "e2", source: "memory-1", target: "merge-1", targetHandle: "input-2", type: "workflow", animated: true },
-      { id: "e3", source: "merge-1", target: "ai-1", type: "workflow", animated: true },
-      { id: "e4", source: "ai-1", target: "output-1", type: "workflow", animated: true },
+      { id: "e1", source: "github-1", target: "merge-1", targetHandle: "input-1", type: "workflow", animated: false },
+      { id: "e2", source: "memory-1", target: "merge-1", targetHandle: "input-2", type: "workflow", animated: false },
+      { id: "e3", source: "merge-1", target: "ai-1", type: "workflow", animated: false },
+      { id: "e4", source: "ai-1", target: "output-1", type: "workflow", animated: false },
     ],
   },
   {
@@ -181,8 +181,8 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "text-1", target: "ai-1", type: "workflow", animated: true },
-      { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: true },
+      { id: "e1", source: "text-1", target: "ai-1", type: "workflow", animated: false },
+      { id: "e2", source: "ai-1", target: "output-1", type: "workflow", animated: false },
     ],
   },
   {
@@ -309,16 +309,16 @@ const templates: Template[] = [
       },
     ],
     edges: [
-      { id: "e1", source: "github-1", target: "merge-1", targetHandle: "input-1", type: "workflow", animated: true },
-      { id: "e2", source: "text-1", target: "merge-1", targetHandle: "input-2", type: "workflow", animated: true },
-      { id: "e3", source: "memory-1", target: "merge-1", type: "workflow", animated: true },
-      { id: "e4", source: "merge-1", target: "ai-1", type: "workflow", animated: true },
-      { id: "e5", source: "ai-1", target: "condition-1", type: "workflow", animated: true },
-      { id: "e6", source: "condition-1", target: "ai-2", sourceHandle: "true", type: "workflow", animated: true },
-      { id: "e7", source: "condition-1", target: "ai-3", sourceHandle: "false", type: "workflow", animated: true },
-      { id: "e8", source: "ai-2", target: "merge-2", targetHandle: "input-1", type: "workflow", animated: true },
-      { id: "e9", source: "ai-3", target: "merge-2", targetHandle: "input-2", type: "workflow", animated: true },
-      { id: "e10", source: "merge-2", target: "output-1", type: "workflow", animated: true },
+      { id: "e1", source: "github-1", target: "merge-1", targetHandle: "input-1", type: "workflow", animated: false },
+      { id: "e2", source: "text-1", target: "merge-1", targetHandle: "input-2", type: "workflow", animated: false },
+      { id: "e3", source: "memory-1", target: "merge-1", type: "workflow", animated: false },
+      { id: "e4", source: "merge-1", target: "ai-1", type: "workflow", animated: false },
+      { id: "e5", source: "ai-1", target: "condition-1", type: "workflow", animated: false },
+      { id: "e6", source: "condition-1", target: "ai-2", sourceHandle: "true", type: "workflow", animated: false },
+      { id: "e7", source: "condition-1", target: "ai-3", sourceHandle: "false", type: "workflow", animated: false },
+      { id: "e8", source: "ai-2", target: "merge-2", targetHandle: "input-1", type: "workflow", animated: false },
+      { id: "e9", source: "ai-3", target: "merge-2", targetHandle: "input-2", type: "workflow", animated: false },
+      { id: "e10", source: "merge-2", target: "output-1", type: "workflow", animated: false },
     ],
   },
   {

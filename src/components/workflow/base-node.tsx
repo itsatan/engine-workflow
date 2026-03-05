@@ -1,5 +1,6 @@
 import type React from "react";
-import { Handle, Position, type NodeProps, useReactFlow } from "@xyflow/react";
+import { useState } from "react";
+import { Handle, Position, type NodeProps, useReactFlow, useStore } from "@xyflow/react";
 import type { WorkflowNodeType, BaseNodeData } from "@/lib/workflow-types";
 import { NODE_COLORS } from "@/lib/node-styles";
 import { useWorkflowStore } from "@/store/workflow-store";
@@ -16,11 +17,14 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   Clock,
   Group,
   Copy,
   Settings,
+  Plus,
 } from "lucide-react";
+import { NodeAddPopover } from "./node-add-popover";
 import "./base-node.css";
 
 const ICONS: Record<WorkflowNodeType, React.ReactNode> = {
@@ -73,6 +77,25 @@ export function BaseNode({
   const { deleteElements, getNode } = useReactFlow();
   const executionStatus = useWorkflowStore((s) => s.nodeExecutionStatus[id]);
   const setSelectedNode = useWorkflowStore((s) => s.setSelectedNode);
+  const isExecuting = useWorkflowStore((s) => s.isExecuting);
+
+  // 获取所有边
+  const edges = useStore((state) => state.edges);
+
+  // 检测右侧句柄是否有连接
+  const hasRightConnection = edges.some(
+    (edge) => edge.source === id && (edge.sourceHandle === undefined || edge.sourceHandle === null)
+  );
+  const hasTrueConnection = edges.some(
+    (edge) => edge.source === id && edge.sourceHandle === "true"
+  );
+  const hasFalseConnection = edges.some(
+    (edge) => edge.source === id && edge.sourceHandle === "false"
+  );
+
+  // 弹出框状态
+  const [showPopover, setShowPopover] = useState(false);
+  const [popoverHandle, setPopoverHandle] = useState<string | undefined>(undefined);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -91,6 +114,7 @@ export function BaseNode({
   const getBorderColor = () => {
     if (executionStatus === 'running') return 'var(--execution-running)';
     if (executionStatus === 'success') return 'var(--execution-success)';
+    if (executionStatus === 'warning') return 'var(--execution-warning)';
     if (executionStatus === 'error') return 'var(--execution-error)';
     return colors.borderColor;
   };
@@ -99,6 +123,7 @@ export function BaseNode({
   const getIconColor = () => {
     if (executionStatus === 'running') return 'var(--execution-running)';
     if (executionStatus === 'success') return 'var(--execution-success)';
+    if (executionStatus === 'warning') return 'var(--execution-warning)';
     if (executionStatus === 'error') return 'var(--execution-error)';
     return colors.accentColor;
   };
@@ -108,6 +133,7 @@ export function BaseNode({
     selected && 'base-node--selected',
     executionStatus === 'running' && 'base-node--running',
     executionStatus === 'success' && 'base-node--success',
+    executionStatus === 'warning' && 'base-node--warning',
     executionStatus === 'error' && 'base-node--error',
   ].filter(Boolean).join(' ');
 
@@ -132,6 +158,9 @@ export function BaseNode({
       )}
       {executionStatus === 'error' && (
         <AlertCircle size={16} className="base-node__status base-node__status--error" />
+      )}
+      {executionStatus === 'warning' && (
+        <AlertTriangle size={16} className="base-node__status base-node__status--warning" />
       )}
       {executionStatus === 'waiting' && (
         <Clock size={16} className="base-node__status base-node__status--waiting" />
@@ -173,29 +202,99 @@ export function BaseNode({
       {/* Custom handles from children (e.g., merge node) */}
       {children}
 
+      {/* 普通输出句柄 - 右侧 */}
       {hasOutput && !hasTrueOutput && (
-        <Handle
-          type="source"
-          position={Position.Right}
-        />
-      )}
-
-      {hasTrueOutput && (
         <>
           <Handle
             type="source"
             position={Position.Right}
+            style={!hasRightConnection ? { opacity: 0, pointerEvents: 'none' } : undefined}
+          />
+          {!hasRightConnection && !isExecuting && (
+            <div className="base-node__add-handle">
+              <button
+                type="button"
+                className="base-node__add-btn"
+                onClick={() => {
+                  setPopoverHandle(undefined);
+                  setShowPopover(!showPopover);
+                }}
+              >
+                <Plus size={14} />
+              </button>
+              {showPopover && popoverHandle === undefined && (
+                <NodeAddPopover
+                  sourceNodeId={id}
+                  onClose={() => setShowPopover(false)}
+                />
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Condition 节点的 True/False 句柄 */}
+      {hasTrueOutput && (
+        <>
+          {/* True 句柄 */}
+          <Handle
+            type="source"
+            position={Position.Right}
             id="true"
-            style={{ top: "35%" }}
+            style={!hasTrueConnection ? { top: "35%", opacity: 0, pointerEvents: 'none' } : { top: "35%" }}
             className="base-node__handle--true"
           />
+          {!hasTrueConnection && !isExecuting && (
+            <div className="base-node__add-handle base-node__add-handle--true">
+              <button
+                type="button"
+                className="base-node__add-btn base-node__add-btn--true"
+                onClick={() => {
+                  setPopoverHandle("true");
+                  setShowPopover(!showPopover || popoverHandle !== "true");
+                }}
+              >
+                <Plus size={12} />
+              </button>
+              {showPopover && popoverHandle === "true" && (
+                <NodeAddPopover
+                  sourceNodeId={id}
+                  sourceHandleId="true"
+                  onClose={() => setShowPopover(false)}
+                />
+              )}
+            </div>
+          )}
+
+          {/* False 句柄 */}
           <Handle
             type="source"
             position={Position.Right}
             id="false"
-            style={{ top: "65%" }}
+            style={!hasFalseConnection ? { top: "65%", opacity: 0, pointerEvents: 'none' } : { top: "65%" }}
             className="base-node__handle--false"
           />
+          {!hasFalseConnection && !isExecuting && (
+            <div className="base-node__add-handle base-node__add-handle--false">
+              <button
+                type="button"
+                className="base-node__add-btn base-node__add-btn--false"
+                onClick={() => {
+                  setPopoverHandle("false");
+                  setShowPopover(!showPopover || popoverHandle !== "false");
+                }}
+              >
+                <Plus size={12} />
+              </button>
+              {showPopover && popoverHandle === "false" && (
+                <NodeAddPopover
+                  sourceNodeId={id}
+                  sourceHandleId="false"
+                  onClose={() => setShowPopover(false)}
+                />
+              )}
+            </div>
+          )}
           <div className="base-node__handle-label base-node__handle-label--true">T</div>
           <div className="base-node__handle-label base-node__handle-label--false">F</div>
         </>

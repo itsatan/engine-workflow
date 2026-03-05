@@ -104,13 +104,14 @@ export interface Workflow {
 }
 
 // Node execution status
-export type NodeExecutionStatus = 'idle' | 'waiting' | 'running' | 'success' | 'error';
+export type NodeExecutionStatus = 'idle' | 'waiting' | 'running' | 'success' | 'warning' | 'error';
 
 // Edge execution data
 export interface EdgeExecutionData {
   edgeId: string;
   durationMs: number;
   dataSize?: number;
+  status?: 'success' | 'warning' | 'error';
 }
 
 // Execution result

@@ -7,3 +7,13 @@
 .workflow-canvas .react-flow {
   background-color: var(--workflow-bg);
 }
+
+/* 禁用 React Flow 默认的边交互层，由自定义边组件处理鼠标事件 */
+.workflow-canvas .react-flow__edge-interaction {
+  pointer-events: none;
+}
+
+/* 确保自定义边的 stroke 颜色不被 React Flow 默认样式覆盖 */
+.workflow-canvas .react-flow__edge-path {
+  stroke: inherit;
+}

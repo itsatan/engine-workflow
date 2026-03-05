@@ -70,6 +70,7 @@
   /* 执行状态色 */
   --execution-running: hsl(40, 90%, 50%);
   --execution-success: hsl(160, 70%, 35%);
+  --execution-warning: hsl(35, 90%, 50%);
   --execution-error: hsl(350, 70%, 50%);
   --execution-waiting: hsl(220, 10%, 65%);
 }

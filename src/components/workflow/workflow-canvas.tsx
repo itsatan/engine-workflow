@@ -183,7 +183,6 @@ export function WorkflowCanvas() {
         defaultEdgeOptions={{
           type: "workflow",
           style: { strokeWidth: 2, stroke: "#52525b" },
-          animated: true,
         }}
       >
         <Background

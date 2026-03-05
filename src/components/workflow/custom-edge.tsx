@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import {
-  BaseEdge,
   getBezierPath,
   EdgeLabelRenderer,
   type EdgeProps,
+  useReactFlow,
 } from "@xyflow/react";
-import { Plus } from "lucide-react";
+import { X } from "lucide-react";
 import { useWorkflowStore } from "@/store/workflow-store";
-import { EdgeAddNodePopover } from "./edge-add-node-popover";
 import "./custom-edge.css";
 
 export function WorkflowEdge({
@@ -18,12 +17,13 @@ export function WorkflowEdge({
   targetY,
   sourcePosition,
   targetPosition,
-  style,
   markerEnd,
 }: EdgeProps) {
-  const [showPopover, setShowPopover] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const edgeData = useWorkflowStore((s) => s.edgeExecutionData[id]);
   const isExecuting = useWorkflowStore((s) => s.isExecuting);
+  const { deleteElements } = useReactFlow();
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -34,20 +34,56 @@ export function WorkflowEdge({
     targetPosition,
   });
 
-  const edgeStroke = edgeData ? "var(--execution-success)" : "#52525b";
+  const edgeStroke = edgeData
+    ? edgeData.status === 'error'
+      ? "var(--execution-error)"
+      : edgeData.status === 'warning'
+        ? "var(--execution-warning)"
+        : "var(--execution-success)"
+    : "#52525b";
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteElements({ edges: [{ id }] });
+  };
+
+  const handleMouseEnter = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 150);
+  }, []);
 
   return (
     <>
-      {/* Visible edge */}
-      <BaseEdge
+      {/* 透明触发区域 - 扩大悬浮检测范围 */}
+      <path
+        d={edgePath}
+        fill="none"
+        strokeWidth={60}
+        stroke="transparent"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        style={{ cursor: "pointer" }}
+      />
+
+      {/* Visible edge - 直接渲染 path 以完全控制颜色 */}
+      <path
         id={id}
-        path={edgePath}
-        style={{
-          ...style,
-          strokeWidth: 2,
-          stroke: edgeStroke,
-        }}
+        d={edgePath}
+        fill="none"
+        strokeWidth={2}
+        stroke={edgeStroke}
         markerEnd={markerEnd}
+        style={{ pointerEvents: "none" }}
+        className="react-flow__edge-path"
       />
 
       <EdgeLabelRenderer>
@@ -59,48 +95,32 @@ export function WorkflowEdge({
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
+              color: edgeStroke,
             }}
           >
             {edgeData.durationMs}ms
           </div>
         )}
 
-        {/* "+" button - visible when no execution data and not running */}
-        {!edgeData && !isExecuting && (
+        {/* 悬浮删除按钮 */}
+        {isHovered && !isExecuting && !edgeData && (
           <div
-            className="custom-edge__add-btn-wrapper"
+            className="custom-edge__delete-btn-wrapper"
             style={{
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
             }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             <button
               type="button"
-              className="custom-edge__add-btn"
-              onClick={() => setShowPopover(!showPopover)}
+              className="custom-edge__delete-btn"
+              onClick={handleDelete}
             >
-              <Plus size={14} />
+              <X size={14} />
             </button>
-          </div>
-        )}
-
-        {/* Node type selector popover */}
-        {showPopover && (
-          <div
-            style={{
-              position: "absolute",
-              transform: `translate(-50%, 0) translate(${labelX}px,${labelY + 20}px)`,
-              pointerEvents: "all",
-              zIndex: 100,
-            }}
-          >
-            <EdgeAddNodePopover
-              edgeId={id}
-              onClose={() => {
-                setShowPopover(false);
-              }}
-            />
           </div>
         )}
       </EdgeLabelRenderer>

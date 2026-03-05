@@ -5,7 +5,7 @@ import type { GitHubNodeData } from "@/lib/workflow-types";
 
 function GitHubNodeComponent({ data, selected, ...props }: NodeProps<GitHubNodeData>) {
   return (
-    <BaseNode nodeType="github" data={data} selected={selected} hasInput={false} {...props} />
+    <BaseNode nodeType="github" data={data} selected={selected} {...props} />
   );
 }
 
